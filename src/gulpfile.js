@@ -62,8 +62,8 @@ gulp.task('stylus_component', function (cb) {
 
 gulp.task('stylus_demo', function (cb) {
     gulp.src([
-            path.join(process.cwd(), './demo/src/**/*.styl')
-        ])
+        path.join(process.cwd(), './demo/src/**/*.styl')
+    ])
         .pipe(sourcemaps.init())
         .pipe(stylus())
         .pipe(concat('demo.css'))
@@ -105,24 +105,24 @@ function svgFilter() {
 gulp.task('svg', function () {
     var buildName = 'tingle-icon-symbols.svg';
     return gulp.src([
-            // 多套皮肤共用的`icon`文件集合
-            './node_modules/@ali/tingle-icon-source/common/*.svg',
+        // 多套皮肤共用的`icon`文件集合
+        './node_modules/@ali/tingle-icon-source/common/*.svg',
 
-            // 默认皮肤使用的`icon`文件集合
-            './node_modules/@ali/tingle-icon-source/default/*.svg',
+        // 默认皮肤使用的`icon`文件集合
+        './node_modules/@ali/tingle-icon-source/default/*.svg',
 
-            // 依赖的组件私有的`icon`文件集合
-            './node_modules/@ali/tingle-*/src/svg/*.svg',
+        // 依赖的组件私有的`icon`文件集合
+        './node_modules/@ali/tingle-*/src/svg/*.svg',
 
-            // 当前组件demo的`icon`文件
-            './demo/src/svg/*.svg',
+        // 当前组件demo的`icon`文件
+        './demo/src/svg/*.svg',
 
-            // 当前组件私有的`icon`文件, 不安规范命名的`icon`不会打进来!!!, 不包含`tingle-`
-            './src/svg/button-*.svg',
+        // 当前组件私有的`icon`文件, 不安规范命名的`icon`不会打进来!!!, 不包含`tingle-`
+        './src/svg/button-*.svg',
 
-            // 构建好的`symbol`文件, 需要排除
-            '!./demo/src/svg/' + buildName
-        ])
+        // 构建好的`symbol`文件, 需要排除
+        '!./demo/src/svg/' + buildName
+    ])
         .pipe(pathMap('%f'))
         .pipe(gulpUniqueFile())
         .pipe(svgFilter())
@@ -185,15 +185,15 @@ gulp.task('build_css', function (cb) {
 gulp.task('build_js', function (cb) {
     gulp.src([path.join(process.cwd(), './src/**/*.js'), path.join(process.cwd(), './src/**/*.jsx')])
         .pipe(babel({
-            presets: ['react', 'es2015', 'stage-1'].map(function(item) {
+            presets: ['react', 'es2015', 'stage-1'].map(function (item) {
                 return require.resolve('babel-preset-' + item);
             }),
-            plugins: ['add-module-exports'].map(function(item) {
+            plugins: ['add-module-exports'].map(function (item) {
                 return require.resolve('babel-plugin-' + item);
-            })
+            }),
         }))
         .pipe(gulp.dest('dist'))
-        .on('end', function() {
+        .on('end', function () {
             console.log('###### build_js done ######')
             cb();
         });;
@@ -206,45 +206,45 @@ gulp.task('copy_logo_ide', function () {
 
 // 发布 tnpm, 防止忘记 build
 gulp.task('publish', ['build_js', 'copy_logo_ide'], function () {
-    util.getQuestions().then(function(questions) {
-        inquirer.prompt(questions).then(function(answers) {
+    util.getQuestions().then(function (questions) {
+        inquirer.prompt(questions).then(function (answers) {
             var pkg = util.getPkg();
             pkg.version = answers.version;
             file.writeFileFromString(JSON.stringify(pkg, null, ' '), 'package.json');
             console.log(colors.info('#### Git Info ####'));
-            spawn.sync('git', ['add', '.'], {stdio: 'inherit'});
-            spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], {stdio: 'inherit'});
-            spawn.sync('git', ['push', 'origin', answers.branch], {stdio: 'inherit'});
+            spawn.sync('git', ['add', '.'], { stdio: 'inherit' });
+            spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], { stdio: 'inherit' });
+            spawn.sync('git', ['push', 'origin', answers.branch], { stdio: 'inherit' });
             console.log(colors.info('#### Npm Info ####'));
-            spawn.sync(answers.npm, ['publish'], {stdio: 'inherit'});
+            spawn.sync(answers.npm, ['publish'], { stdio: 'inherit' });
         });
     });
 });
 
-gulp.task('dep', function() {
+gulp.task('dep', function () {
     var commands = util.getPackages();
-    commands.forEach(function(item) {
+    commands.forEach(function (item) {
         util.runCmd('npm', ['i', '-d', item]);
     });
 });
 
-gulp.task('update', function() {
+gulp.task('update', function () {
     var commands = util.getPackages();
-    commands.forEach(function(item) {
+    commands.forEach(function (item) {
         util.runCmd('npm', ['update', '-d', item]);
     });
 });
 
-gulp.task('tnpm-dep', function() {
+gulp.task('tnpm-dep', function () {
     var commands = util.getPackages();
-    commands.forEach(function(item) {
+    commands.forEach(function (item) {
         util.runCmd('tnpm', ['i', '-d', item]);
     });
 });
 
-gulp.task('tnpm-update', function() {
+gulp.task('tnpm-update', function () {
     var commands = util.getPackages();
-    commands.forEach(function(item) {
+    commands.forEach(function (item) {
         util.runCmd('tnpm', ['update', '-d', item]);
     });
 });
