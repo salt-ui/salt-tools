@@ -9,6 +9,7 @@ var gulp = require('gulp');
 var fs = require('fs');
 var inquirer = require('inquirer');
 var file = require('html-wiring');
+var colors = require('colors');
 
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
