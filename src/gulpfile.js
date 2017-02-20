@@ -211,7 +211,7 @@ gulp.task('publish', ['build_js', 'copy_logo_ide'], function () {
         inquirer.prompt(questions).then(function (answers) {
             var pkg = util.getPkg();
             pkg.version = answers.version;
-            file.writeFileFromString(JSON.stringify(pkg, null, ' '), 'package.json');
+            file.writeFileFromString(JSON.stringify(pkg, null, '  '), 'package.json');
             console.log(colors.info('#### Git Info ####'));
             spawn.sync('git', ['add', '.'], { stdio: 'inherit' });
             spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], { stdio: 'inherit' });
