@@ -41,7 +41,7 @@ module.exports = {
                 }
             }, {
                 test: /\.svg$/,
-                loader: 'svg2react'
+                loader: '@ali/tingle-svg2react-loader'
             }
         ]
     },
