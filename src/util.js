@@ -52,7 +52,7 @@ var utils = {
     getPackages: function() {
         var commands = [];
         for (var item in pkg.devDependencies) {
-            if (item !== 'uxcore-tools') {
+            if (item !== 'salt-tools') {
                 commands.push(item + '@' + pkg.devDependencies[item]);
             }
         }
