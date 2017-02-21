@@ -133,6 +133,7 @@ gulp.task('svg', function () {
 });
 
 gulp.task('reload_by_js', ['pack_demo'], function () {
+    console.log('reload_by_js');
     reload();
 });
 
@@ -161,11 +162,16 @@ gulp.task('develop', [
         open: 'external'
     });
 
-    gulp.watch(['src/**/*.js', 'demo/src/**/*.js'], ['reload_by_js']);
+    gulp.watch([
+        path.join(process.cwd(), './src/**/*.js'), 
+        path.join(process.cwd(), './src/**/*.jsx'), 
+        path.join(process.cwd(), './demo/src/**/*.js'),
+        path.join(process.cwd(), './demo/src/**/*.jsx'), 
+    ], ['reload_by_js']);
 
-    gulp.watch('src/**/*.styl', ['reload_by_demo_css']);
+    gulp.watch(path.join(process.cwd(), './src/**/*.styl'), ['reload_by_demo_css']);
 
-    gulp.watch('demo/src/**/*.styl', ['reload_by_demo_css']);
+    gulp.watch(path.join(process.cwd(), './demo/src/**/*.styl'), ['reload_by_demo_css']);
 
     // 监听svg icon文件的变化
     gulp.watch([
