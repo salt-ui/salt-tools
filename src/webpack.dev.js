@@ -41,7 +41,7 @@ module.exports = {
                 }
             }, {
                 test: /\.svg$/,
-                loader: '@ali/tingle-svg2react-loader'
+                loader: 'salt-svg-loader'
             }
         ]
     },
