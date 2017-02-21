@@ -9,6 +9,7 @@ var gulp = require('gulp');
 var fs = require('fs');
 var inquirer = require('inquirer');
 var file = require('html-wiring');
+var colors = require('colors');
 
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
@@ -210,7 +211,7 @@ gulp.task('publish', ['build_js', 'copy_logo_ide'], function () {
         inquirer.prompt(questions).then(function (answers) {
             var pkg = util.getPkg();
             pkg.version = answers.version;
-            file.writeFileFromString(JSON.stringify(pkg, null, ' '), 'package.json');
+            file.writeFileFromString(JSON.stringify(pkg, null, '  '), 'package.json');
             console.log(colors.info('#### Git Info ####'));
             spawn.sync('git', ['add', '.'], { stdio: 'inherit' });
             spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], { stdio: 'inherit' });
