@@ -27,12 +27,31 @@ var svgStore = require('gulp-svgstore');
 var through = require('through2');
 var spawn = require('cross-spawn');
 var path = require('path');
+var cloneDeep = require('lodash/cloneDeep');
+var assign = require('lodash/assign');
 
 var util = require('./util');
+const commonWebpackCfg = require('./webpack.dev.js');
 
+
+var doQueryAndPub = function() {
+    util.getQuestions().then(function (questions) {
+        inquirer.prompt(questions).then(function (answers) {
+            var pkg = util.getPkg();
+            pkg.version = answers.version;
+            file.writeFileFromString(JSON.stringify(pkg, null, '  '), 'package.json');
+            console.log(colors.info('#### Git Info ####'));
+            spawn.sync('git', ['add', '.'], { stdio: 'inherit' });
+            spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], { stdio: 'inherit' });
+            spawn.sync('git', ['push', 'origin', answers.branch], { stdio: 'inherit' });
+            console.log(colors.info('#### Npm Info ####'));
+            spawn.sync(answers.npm, ['publish'], { stdio: 'inherit' });
+        });
+    });
+}
 
 gulp.task('pack_demo', function (cb) {
-    webpack(require('./webpack.dev.js'), function (err, stats) {
+    webpack(commonWebpackCfg, function (err, stats) {
         // 重要 打包过程中的语法错误反映在stats中
         console.log('webpack log:' + stats);
         if (stats.hasErrors()) {
@@ -48,6 +67,30 @@ gulp.task('pack_demo', function (cb) {
         }
         console.info('###### pack_demo done ######');
         cb();
+    });
+});
+
+gulp.task('icon-build', function (cb) {
+    var config = cloneDeep(commonWebpackCfg);
+    assign(config, {
+        entry: {
+            index: './src/index',
+        },
+        output: {
+            path: './dist',
+            filename: "[name].js",
+            libraryTarget: 'commonjs2',
+        },
+        externals: {
+            react: 'commonjs react',
+            classnames: 'commonjs classnames',
+            'react-dom': 'commonjs react-dom',
+        }
+    });
+    delete config.devtool;
+    webpack(config, function(err, stats) {
+        cb();
+        console.info('###### icon-build done ######');
     });
 });
 
@@ -213,20 +256,12 @@ gulp.task('copy_logo_ide', function () {
 
 // 发布 tnpm, 防止忘记 build
 gulp.task('publish', ['build_js', 'copy_logo_ide'], function () {
-    util.getQuestions().then(function (questions) {
-        inquirer.prompt(questions).then(function (answers) {
-            var pkg = util.getPkg();
-            pkg.version = answers.version;
-            file.writeFileFromString(JSON.stringify(pkg, null, '  '), 'package.json');
-            console.log(colors.info('#### Git Info ####'));
-            spawn.sync('git', ['add', '.'], { stdio: 'inherit' });
-            spawn.sync('git', ['commit', '-m', 'ver. ' + pkg.version], { stdio: 'inherit' });
-            spawn.sync('git', ['push', 'origin', answers.branch], { stdio: 'inherit' });
-            console.log(colors.info('#### Npm Info ####'));
-            spawn.sync(answers.npm, ['publish'], { stdio: 'inherit' });
-        });
-    });
+    doQueryAndPub();
 });
+
+gulp.task('icon-publish', ['icon-build', 'copy_logo_ide'], function() {
+    doQueryAndPub();
+})
 
 gulp.task('dep', function () {
     var commands = util.getPackages();
