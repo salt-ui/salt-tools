@@ -1,3 +1,7 @@
+## 0.1.5
+
+* `NEW` add autoPrefixer
+
 ## 0.1.4
 
 * `NEW` new task `icon-build` & `icon-publish` for `tingle-icon`

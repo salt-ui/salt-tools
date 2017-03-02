@@ -24,6 +24,7 @@ var replace = require('gulp-just-replace');
 var gulpUniqueFile = require('gulp-unique-files');
 var pathMap = require('gulp-pathmap');
 var svgStore = require('gulp-svgstore');
+var autoprefixer = require('gulp-autoprefixer');
 var through = require('through2');
 var spawn = require('cross-spawn');
 var path = require('path');
