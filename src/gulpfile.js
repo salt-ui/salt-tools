@@ -94,22 +94,15 @@ gulp.task('icon-build', function (cb) {
     });
 });
 
-gulp.task('stylus_component', function (cb) {
-    gulp.src(['./src/**/*.styl'])
-        .pipe(sourcemaps.init())
-        .pipe(stylus())
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('./src'));
-    console.info('###### stylus_component done ######');
-    cb();
-});
-
 gulp.task('stylus_demo', function (cb) {
     gulp.src([
         path.join(process.cwd(), './demo/src/**/*.styl')
     ])
         .pipe(sourcemaps.init())
         .pipe(stylus())
+        .pipe(autoprefixer({
+            browsers: ['iOS >= 7', 'Android >= 2.3', 'FireFoxAndroid >= 46', '> 1%'],
+         }))
         .pipe(concat('demo.css'))
         .pipe(replace([{
             search: /\/\*#\ssourceMappingURL=([^\*\/]+)\.map\s\*\//g,
@@ -177,10 +170,6 @@ gulp.task('svg', function () {
 
 gulp.task('reload_by_js', ['pack_demo'], function () {
     console.log('reload_by_js');
-    reload();
-});
-
-gulp.task('reload_by_component_css', ['stylus_component'], function () {
     reload();
 });
 
