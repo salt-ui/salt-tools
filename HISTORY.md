@@ -1,3 +1,8 @@
+## 0.1.8
+
+* `CHANGED` 去除 svg 任务。
+* `CHANGED` 支持本地配置 webpack config
+
 ## 0.1.5
 
 * `NEW` add autoPrefixer

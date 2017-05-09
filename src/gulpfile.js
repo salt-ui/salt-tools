@@ -30,12 +30,13 @@ var spawn = require('cross-spawn');
 var path = require('path');
 var cloneDeep = require('lodash/cloneDeep');
 var assign = require('lodash/assign');
+var mergeWith = require('lodash/mergeWith');
 
 var util = require('./util');
 const commonWebpackCfg = require('./webpack.dev.js');
 
 
-var doQueryAndPub = function() {
+var doQueryAndPub = function () {
     util.getQuestions().then(function (questions) {
         inquirer.prompt(questions).then(function (answers) {
             var pkg = util.getPkg();
@@ -52,7 +53,17 @@ var doQueryAndPub = function() {
 }
 
 gulp.task('pack_demo', function (cb) {
-    webpack(commonWebpackCfg, function (err, stats) {
+    var customWebpackCfg = {};
+    var customWebpackCfgPath = path.join(process.cwd(), './webpack.custom.js');
+    if (fs.existsSync(customWebpackCfgPath)) {
+        customWebpackCfg = require(customWebpackCfgPath);
+    }
+
+    webpack(mergeWith(commonWebpackCfg, customWebpackCfg, function (objValue, srcValue) {
+        if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+            return objValue.concat(srcValue);
+        }
+    }), function (err, stats) {
         // 重要 打包过程中的语法错误反映在stats中
         console.log('webpack log:' + stats);
         if (stats.hasErrors()) {
@@ -89,7 +100,7 @@ gulp.task('icon-build', function (cb) {
         }
     });
     delete config.devtool;
-    webpack(config, function(err, stats) {
+    webpack(config, function (err, stats) {
         cb();
         console.info('###### icon-build done ######');
     });
@@ -103,7 +114,7 @@ gulp.task('stylus_demo', function (cb) {
         .pipe(stylus())
         .pipe(autoprefixer({
             browsers: ['iOS >= 7', 'Android >= 2.3', 'FireFoxAndroid >= 46', '> 1%'],
-         }))
+        }))
         .pipe(concat('demo.css'))
         .pipe(replace([{
             search: /\/\*#\ssourceMappingURL=([^\*\/]+)\.map\s\*\//g,
@@ -178,7 +189,7 @@ gulp.task('reload_by_demo_css', ['stylus_demo'], function () {
     reload();
 });
 
-gulp.task('reload_by_svg', ['svg'], function () {
+gulp.task('reload_by_svg', function () {
     reload();
 });
 
@@ -186,7 +197,6 @@ gulp.task('reload_by_svg', ['svg'], function () {
 gulp.task('develop', [
     'pack_demo',
     'stylus_demo',
-    'svg'
 ], function () {
     browserSync({
         server: {
@@ -196,10 +206,10 @@ gulp.task('develop', [
     });
 
     gulp.watch([
-        path.join(process.cwd(), './src/**/*.js'), 
-        path.join(process.cwd(), './src/**/*.jsx'), 
+        path.join(process.cwd(), './src/**/*.js'),
+        path.join(process.cwd(), './src/**/*.jsx'),
         path.join(process.cwd(), './demo/src/**/*.js'),
-        path.join(process.cwd(), './demo/src/**/*.jsx'), 
+        path.join(process.cwd(), './demo/src/**/*.jsx'),
     ], ['reload_by_js']);
 
     gulp.watch(path.join(process.cwd(), './src/**/*.styl'), ['reload_by_demo_css']);
@@ -249,7 +259,7 @@ gulp.task('publish', ['build_js', 'copy_logo_ide'], function () {
     doQueryAndPub();
 });
 
-gulp.task('icon-publish', ['icon-build', 'copy_logo_ide'], function() {
+gulp.task('icon-publish', ['icon-build', 'copy_logo_ide'], function () {
     doQueryAndPub();
 })
 
