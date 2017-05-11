@@ -1,3 +1,7 @@
+## 0.1.9
+
+* `CHANGED` stylus 出错不会中断整个 dev。
+
 ## 0.1.8
 
 * `CHANGED` 去除 svg 任务。

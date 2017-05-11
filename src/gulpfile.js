@@ -112,6 +112,10 @@ gulp.task('stylus_demo', function (cb) {
     ])
         .pipe(sourcemaps.init())
         .pipe(stylus())
+        .on('error', function(error) {
+            console.log(error);
+            this.emit('end');
+        })
         .pipe(autoprefixer({
             browsers: ['iOS >= 7', 'Android >= 2.3', 'FireFoxAndroid >= 46', '> 1%'],
         }))
