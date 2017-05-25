@@ -33,8 +33,10 @@
     "cross-spawn": "^5.0.1",
     "git-rev": "^0.2.1",
     "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
     "gulp-babel": "^6.1.2",
     "gulp-concat": "^2.6.1",
+    "gulp-ejs": "^3.0.1",
     "gulp-just-replace": "^1.0.2",
     "gulp-pathmap": "^0.1.0",
     "gulp-rename": "^1.2.2",
@@ -43,7 +45,6 @@
     "gulp-svgstore": "^6.1.0",
     "gulp-uglify": "^2.0.0",
     "gulp-unique-files": "^0.1.2",
-    "gulp-autoprefixer": "^3.1.1",
     "html-wiring": "^1.2.0",
     "inquirer": "^3.0.1",
     "lodash": "^4.17.4",
@@ -53,6 +54,5 @@
     "through2": "^2.0.3",
     "webpack": "^1.14.0"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

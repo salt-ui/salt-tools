@@ -5,6 +5,8 @@ var eslintCfg = JSON.parse(file.readFileAsString(__dirname + '/eslintrc.json'));
 var userLintCfg;
 var Promise = require('promise');
 var git = require('git-rev');
+var gulp = require('gulp');
+var babel = require('gulp-babel');
 
 try {
     userLintCfg = JSON.parse(file.readFileAsString(path.join(process.cwd(), './.eslintrc.json')));
@@ -109,6 +111,24 @@ var utils = {
                 resolve(questions);
             });
         })
+    },
+    buildJs: function(path, cb) {
+        gulp.src(path)
+            .pipe(babel({
+                presets: ['react', 'es2015', 'stage-1'].map(function (item) {
+                    return require.resolve('babel-preset-' + item);
+                }),
+                plugins: ['add-module-exports'].map(function (item) {
+                    return require.resolve('babel-plugin-' + item);
+                }),
+            }))
+            .pipe(gulp.dest('dist'))
+            .on('end', function () {
+                console.log('###### build_js done ######')
+                if (cb) {
+                    cb();
+                }
+            });
     }
 }
 

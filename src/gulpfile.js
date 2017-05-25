@@ -25,12 +25,14 @@ var gulpUniqueFile = require('gulp-unique-files');
 var pathMap = require('gulp-pathmap');
 var svgStore = require('gulp-svgstore');
 var autoprefixer = require('gulp-autoprefixer');
+var ejs = require('gulp-ejs');
 var through = require('through2');
 var spawn = require('cross-spawn');
 var path = require('path');
 var cloneDeep = require('lodash/cloneDeep');
 var assign = require('lodash/assign');
 var mergeWith = require('lodash/mergeWith');
+var _ = require('lodash');
 
 var util = require('./util');
 const commonWebpackCfg = require('./webpack.dev.js');
@@ -82,14 +84,49 @@ gulp.task('pack_demo', function (cb) {
     });
 });
 
+gulp.task('icon-make-js', function(cb) {
+    var svgs = fs.readdirSync(path.join(process.cwd(), './src/svg')).filter(function(name) {
+        return /\.svg$/.test(name);
+    }).map(function(name) {
+        return name.replace(/\.svg$/, '');
+    });
+    var count = 0;
+    svgs.forEach(function(name) {
+        var camelName = _.camelCase(name);
+        var IconName = camelName[0].toUpperCase() + camelName.slice(1);
+        gulp
+            .src([
+                path.join(__dirname, './templates/Icon.js'),
+            ])
+            .pipe(ejs({
+                iconname: name,
+                IconName: IconName,
+            }))
+            .pipe(rename(IconName + '.js'))
+            .pipe(gulp.dest('src/lib'))
+            .on('end', function() {
+                count += 1;
+                if (count === svgs.length) {
+                    cb();
+                    console.info('###### icon-make-js done ######');
+                }
+            })
+    })
+});
+
 gulp.task('icon-build', function (cb) {
+    var icons = fs.readdirSync(path.join(process.cwd(), './src/lib'));
+    var entries = {};
+    icons.forEach(function(icon) {
+        var name = icon.replace(/\.js$/, '');
+        entries[name] = './src/lib/' + name;
+    });
     var config = cloneDeep(commonWebpackCfg);
+    var count = 0;
     assign(config, {
-        entry: {
-            index: './src/index',
-        },
+        entry: entries,
         output: {
-            path: './dist',
+            path: './lib',
             filename: "[name].js",
             libraryTarget: 'commonjs2',
         },
@@ -101,8 +138,18 @@ gulp.task('icon-build', function (cb) {
     });
     delete config.devtool;
     webpack(config, function (err, stats) {
-        cb();
-        console.info('###### icon-build done ######');
+        count += 1;
+        if (count === 2) {
+            cb();
+            console.info('###### icon-build done ######');
+        }
+    });
+    util.buildJs([path.join(process.cwd(), './src/*.js'), path.join(process.cwd(), './src/*.jsx')], function() {
+        count += 1;
+        if (count === 2) {
+            cb();
+            console.info('###### icon-build done ######');
+        } 
     });
 });
 
@@ -237,20 +284,7 @@ gulp.task('build_css', function (cb) {
 
 // 构建js
 gulp.task('build_js', function (cb) {
-    gulp.src([path.join(process.cwd(), './src/**/*.js'), path.join(process.cwd(), './src/**/*.jsx')])
-        .pipe(babel({
-            presets: ['react', 'es2015', 'stage-1'].map(function (item) {
-                return require.resolve('babel-preset-' + item);
-            }),
-            plugins: ['add-module-exports'].map(function (item) {
-                return require.resolve('babel-plugin-' + item);
-            }),
-        }))
-        .pipe(gulp.dest('dist'))
-        .on('end', function () {
-            console.log('###### build_js done ######')
-            cb();
-        });;
+    util.buildJs([path.join(process.cwd(), './src/**/*.js'), path.join(process.cwd(), './src/**/*.jsx')], cb);
 });
 
 gulp.task('copy_logo_ide', function () {
