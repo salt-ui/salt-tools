@@ -1,6 +1,6 @@
 {
   "name": "salt-tools",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "saltui component development tools",
   "main": "index.js",
   "scripts": {
