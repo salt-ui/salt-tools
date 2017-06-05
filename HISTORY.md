@@ -1,3 +1,7 @@
+## 0.1.11
+
+* `CHANGED` include css in stylus
+
 ## 0.1.10
 
 * `CHANGED` more powerful support for icon build

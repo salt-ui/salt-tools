@@ -158,7 +158,9 @@ gulp.task('stylus_demo', function (cb) {
         path.join(process.cwd(), './demo/src/**/*.styl')
     ])
         .pipe(sourcemaps.init())
-        .pipe(stylus())
+        .pipe(stylus({
+            'include css': true,
+        }))
         .on('error', function(error) {
             console.log(error);
             this.emit('end');
