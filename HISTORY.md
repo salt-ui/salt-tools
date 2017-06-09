@@ -1,3 +1,7 @@
+## 0.1.12
+
+* `CHANGED` tnpm-update support tnpm@4.x
+
 ## 0.1.11
 
 * `CHANGED` include css in stylus

@@ -60,6 +60,7 @@ gulp.task('pack_demo', function (cb) {
     if (fs.existsSync(customWebpackCfgPath)) {
         customWebpackCfg = require(customWebpackCfgPath);
     }
+    var timeEnd = new Date().getTime();
 
     webpack(mergeWith(commonWebpackCfg, customWebpackCfg, function (objValue, srcValue) {
         if (Array.isArray(objValue) && Array.isArray(srcValue)) {
@@ -84,14 +85,14 @@ gulp.task('pack_demo', function (cb) {
     });
 });
 
-gulp.task('icon-make-js', function(cb) {
-    var svgs = fs.readdirSync(path.join(process.cwd(), './src/svg')).filter(function(name) {
+gulp.task('icon-make-js', function (cb) {
+    var svgs = fs.readdirSync(path.join(process.cwd(), './src/svg')).filter(function (name) {
         return /\.svg$/.test(name);
-    }).map(function(name) {
+    }).map(function (name) {
         return name.replace(/\.svg$/, '');
     });
     var count = 0;
-    svgs.forEach(function(name) {
+    svgs.forEach(function (name) {
         var camelName = _.camelCase(name);
         var IconName = camelName[0].toUpperCase() + camelName.slice(1);
         gulp
@@ -104,7 +105,7 @@ gulp.task('icon-make-js', function(cb) {
             }))
             .pipe(rename(IconName + '.js'))
             .pipe(gulp.dest('src/lib'))
-            .on('end', function() {
+            .on('end', function () {
                 count += 1;
                 if (count === svgs.length) {
                     cb();
@@ -117,7 +118,7 @@ gulp.task('icon-make-js', function(cb) {
 gulp.task('icon-build', function (cb) {
     var icons = fs.readdirSync(path.join(process.cwd(), './src/lib'));
     var entries = {};
-    icons.forEach(function(icon) {
+    icons.forEach(function (icon) {
         var name = icon.replace(/\.js$/, '');
         entries[name] = './src/lib/' + name;
     });
@@ -144,12 +145,12 @@ gulp.task('icon-build', function (cb) {
             console.info('###### icon-build done ######');
         }
     });
-    util.buildJs([path.join(process.cwd(), './src/*.js'), path.join(process.cwd(), './src/*.jsx')], function() {
+    util.buildJs([path.join(process.cwd(), './src/*.js'), path.join(process.cwd(), './src/*.jsx')], function () {
         count += 1;
         if (count === 2) {
             cb();
             console.info('###### icon-build done ######');
-        } 
+        }
     });
 });
 
@@ -161,7 +162,7 @@ gulp.task('stylus_demo', function (cb) {
         .pipe(stylus({
             'include css': true,
         }))
-        .on('error', function(error) {
+        .on('error', function (error) {
             console.log(error);
             this.emit('end');
         })
@@ -326,9 +327,24 @@ gulp.task('tnpm-dep', function () {
 
 gulp.task('tnpm-update', function () {
     var commands = util.getPackages();
-    commands.forEach(function (item) {
-        util.runCmd('tnpm', ['update', '-d', item]);
-    });
+    console.log('getting tnpm version...')
+    util.runCmd('tnpm', ['-v'], function () { }, function (data) {
+        var tnpmVersion = data.match(/tnpm@(\d)/);
+        if (parseInt(tnpmVersion[1], 10) === 4) {
+            console.log('rm -rf node_modules/')
+            util.runCmd('rm', ['-rf', 'node_modules/'], function () {
+                console.log('install dependencies...')
+                commands.forEach(function (item) {
+                    util.runCmd('tnpm', ['i', '-d', item]);
+                });
+            });
+        } else {
+            commands.forEach(function (item) {
+                util.runCmd('tnpm', ['update', '-d', item]);
+            });
+        }
+    })
+
 });
 
 // 快捷方式

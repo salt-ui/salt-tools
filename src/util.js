@@ -10,10 +10,10 @@ var babel = require('gulp-babel');
 
 try {
     userLintCfg = JSON.parse(file.readFileAsString(path.join(process.cwd(), './.eslintrc.json')));
-} catch (e) {}
+} catch (e) { }
 
 var utils = {
-    versionCompare: function(a, b) {
+    versionCompare: function (a, b) {
         var aArr = a.split('.');
         var bArr = b.split('.');
         var larger = false;
@@ -28,30 +28,35 @@ var utils = {
         }
         return larger;
     },
-    runCmd: function(cmd, args, fn) {
+    runCmd: function (cmd, args, fn, stdoutFn) {
         args = args || [];
         var runner = require('child_process').spawn(cmd, args, {
             // keep color
-            stdio: 'inherit',
+            stdio: stdoutFn ? 'pipe' : 'inherit',
         });
-        runner.on('close', function(code) {
+        if (stdoutFn) {
+            runner.stdout.on('data', function (data) {
+                stdoutFn(data.toString());
+            });
+        }
+        runner.on('close', function (code) {
             if (fn) {
                 fn(code);
             }
         });
     },
-    getFromCwd: function() {
+    getFromCwd: function () {
         var args = [].slice.call(arguments, 0);
         args.unshift(process.cwd());
         return path.join.apply(path, args);
     },
-    getPkg: function() {
+    getPkg: function () {
         return pkg;
     },
-    getEslintCfg: function() {
+    getEslintCfg: function () {
         return userLintCfg || eslintCfg;
     },
-    getPackages: function() {
+    getPackages: function () {
         var commands = [];
         for (var item in pkg.devDependencies) {
             if (item !== 'salt-tools') {
@@ -61,10 +66,10 @@ var utils = {
         commands.push('--production');
         return commands;
     },
-    getQuestions: function() {
+    getQuestions: function () {
         var me = this;
-        return new Promise(function(resolve, reject) {
-            git.branch(function(branch) {
+        return new Promise(function (resolve, reject) {
+            git.branch(function (branch) {
                 var defaultBranch = branch;
                 var defaultNpm = /@ali/.test(pkg.name) ? 'tnpm' : 'npm';
                 var questions = [
@@ -73,7 +78,7 @@ var utils = {
                         name: 'version',
                         message: 'please enter the package version to publish (should be xx.xx.xx)',
                         default: pkg.version,
-                        validate: function(input) {
+                        validate: function (input) {
                             if (/\d+\.\d+\.\d+/.test(input)) {
                                 if (me.versionCompare(input, pkg.version)) {
                                     return true;
@@ -98,7 +103,7 @@ var utils = {
                         name: 'npm',
                         message: 'which npm you want to publish',
                         default: defaultNpm,
-                        validate: function(input) {
+                        validate: function (input) {
                             if (/npm/.test(input)) {
                                 return true;
                             }
@@ -112,7 +117,7 @@ var utils = {
             });
         })
     },
-    buildJs: function(path, cb) {
+    buildJs: function (path, cb) {
         gulp.src(path)
             .pipe(babel({
                 presets: ['react', 'es2015', 'stage-1'].map(function (item) {
