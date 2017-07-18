@@ -29,6 +29,7 @@ var utils = {
         return larger;
     },
     runCmd: function (cmd, args, fn, stdoutFn) {
+        console.log('Run CMD: ' + cmd + ' ' + args.join(' '));
         args = args || [];
         var runner = require('child_process').spawn(cmd, args, {
             // keep color
@@ -58,12 +59,14 @@ var utils = {
     },
     getPackages: function () {
         var commands = [];
+        for (var item in pkg.dependencies) {
+            commands.push(item + '@' + pkg.dependencies[item])
+        }
         for (var item in pkg.devDependencies) {
             if (item !== 'salt-tools') {
                 commands.push(item + '@' + pkg.devDependencies[item]);
             }
         }
-        commands.push('--production');
         return commands;
     },
     getQuestions: function () {

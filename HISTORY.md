@@ -1,3 +1,7 @@
+## 0.1.13
+
+* `CHANGED` imporve dep installation performance
+
 ## 0.1.12
 
 * `CHANGED` tnpm-update support tnpm@4.x
