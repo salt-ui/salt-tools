@@ -1,3 +1,7 @@
+## 0.1.14
+
+* `FIXED` improve tnpm installation using `--by=npm`
+
 ## 0.1.13
 
 * `CHANGED` imporve dep installation performance

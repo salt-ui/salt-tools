@@ -311,12 +311,12 @@ gulp.task('dep', function () {
 
 gulp.task('update', function () {
     var commands = util.getPackages();
-    util.runCmd('npm', ['update', '-d'].concat(commands));
+    util.runCmd('npm', ['update', '-d'].concat(commands.map(cmd => cmd.split('@')[0])));
 });
 
 gulp.task('tnpm-dep', function () {
     var commands = util.getPackages();
-    util.runCmd('tnpm', ['i', '-d'].concat(commands));
+    util.runCmd('tnpm', ['i', '-d', '--by=npm'].concat(commands));
 });
 
 gulp.task('tnpm-update', function () {
@@ -330,7 +330,7 @@ gulp.task('tnpm-update', function () {
                 util.runCmd('npm', ['run', 'tnpm-dep']);
             });
         } else {
-            util.runCmd('tnpm', ['update', '-d'].concat(commands));
+            util.runCmd('tnpm', ['update', '-d', '--by=npm'].concat(commands.map(cmd => cmd.split('@')[0])));
         }
     })
 
