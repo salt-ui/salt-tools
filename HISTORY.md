@@ -1,3 +1,7 @@
+## 0.1.15 
+
+* `FIXED` npm@5 will auto save dependencies when installing specific package 
+
 ## 0.1.14
 
 * `FIXED` improve tnpm installation using `--by=npm`
