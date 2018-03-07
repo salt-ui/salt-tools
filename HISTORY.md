@@ -1,3 +1,7 @@
+## 0.1.16
+
+* `CHANGED` iconMake template use `React@15.x` version
+
 ## 0.1.15 
 
 * `FIXED` npm@5 will auto save dependencies when installing specific package 
